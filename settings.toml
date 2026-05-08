@@ -2,9 +2,11 @@
 current = "v0.0.0-alpha"
 
 [settings]
-EtherScanApiKeys = ["MBXWI4I69KTZW873HZHKG6DDRGHGW4B1EM", "GA7PY4PE6I3PIYXDSMWW4I98QASKSA11DK", "THF8Q6FVQCYSSHUBY89RX987IFEW5FBYD7"] # free etherScan API keys can be got at https://etherscan.io/myapikey
-rpcProviders = [ "https://docs-demo.quiknode.pro/"  ] # this is a demo rpc provider by QuickNode, for large scale use, you can get a paid plan at https://www.quiknode.io/
-ethArchives = [ "https://eth.llamarpc.com" ] # free rpc providers can also be got at alchemy.com
+EtherScanApiKeys = ["AIIG5TBENEMJHXG8END5FXRM1N7ND3KPZI"]
+
+rpcProviders = ["https://api-ethereum-mainnet.n.dwellir.com/b4942464-de9e-42fe-bfe4-80611faa04b" ]
+
+ethArchives = ["https://api-ethereum-mainnet.n.dwellir.com/b4942464-de9e-42fe-bfe4-80611faa04b"]
 
 [runtime]
 LoggingUpperBound = 1000
