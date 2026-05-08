@@ -3,7 +3,7 @@ import os
 from parserPackage.locator import *
 from parserPackage.parser import proxyMap
 from trackerPackage.dataSource import *
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from crawlPackage.crawlEtherscan import CrawlEtherscan
 from utilsPackage.compressor import *
 from staticAnalyzer.analyzer import Analyzer
@@ -21,7 +21,7 @@ settings = toml.load("settings.toml")
 # 2. is msg.sender/tx.origin owner?
 # 3. is msg.sender/tx.origin manager?
 def inferAccessControl(accesslistTable):    
-    crawlQuickNode = CrawlQuickNode()
+    crawlRPC = CrawlRPC()
     crawlEtherscan = CrawlEtherscan()
 
     for contract, accessList in accesslistTable:
@@ -65,7 +65,7 @@ def inferAccessControl(accesslistTable):
         analyzer = Analyzer()
         for tx, funcCallList in accessList:
             counter += 1
-            origin = crawlQuickNode.Tx2Details(tx)["from"].lower()
+            origin = crawlRPC.Tx2Details(tx)["from"].lower()
             if len(funcCallList) != 1:
                 print(funcCallList)
                 sys.exit("access control infer: not one function call in a transaction")

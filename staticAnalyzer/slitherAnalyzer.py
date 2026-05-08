@@ -4,7 +4,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 from crawlPackage.crawlEtherscan import CrawlEtherscan
-# from crawlPackage.crawlQuicknode import CrawlQuickNode
+# from crawlPackage.crawlRPC import CrawlRPC
 # from crawlPackage.crawlTrueBlocks import CrawlTrueBlocks
 from web3 import Web3, HTTPProvider
 

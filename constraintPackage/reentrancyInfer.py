@@ -4,7 +4,7 @@ from parserPackage.locator import *
 import copy
 from trackerPackage.dataSource import *
 from fetchPackage.fetchTrace import fetcher 
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from crawlPackage.crawlEtherscan import CrawlEtherscan
 from utilsPackage.compressor import *
 from staticAnalyzer.analyzer import Analyzer

@@ -195,7 +195,7 @@ replaceBackMap = {
 # 2. oracle deviations  namely, x < (new oracle - old oracle) / new oracle < y
 
 def inferOracleRange(benchmarks):
-    crawlQuickNode = CrawlQuickNode()
+    crawlRPC = CrawlRPC()
     crawlEtherscan = CrawlEtherscan()
     isStart = False
 

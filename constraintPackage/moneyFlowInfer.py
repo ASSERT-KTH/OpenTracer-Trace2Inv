@@ -3,7 +3,7 @@ import os
 from parserPackage.locator import *
 from parserPackage.parser import proxyMap
 from trackerPackage.dataSource import *
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from crawlPackage.crawlEtherscan import CrawlEtherscan
 from utilsPackage.compressor import *
 from parserPackage.decoder import *
@@ -156,7 +156,7 @@ etherBenchmarks = [
 # 2. ranges for data flow
 
 def inferMoneyFlows(executionTable, originalContract, transferToken):
-    crawlQuickNode = CrawlQuickNode()
+    crawlRPC = CrawlRPC()
     crawlEtherscan = CrawlEtherscan()
 
     
@@ -246,7 +246,7 @@ def inferMoneyFlows(executionTable, originalContract, transferToken):
             moneyFlowMap[name]["transferPC"].append(pc)
 
             transferTokenBalance = None
-            block = crawlQuickNode.Tx2Block(tx)
+            block = crawlRPC.Tx2Block(tx)
             if "sstore" in metaData and len(metaData["sstore"]) == 3 and isinstance(metaData["sstore"][0], str) and \
                 (metaData["sstore"][0] == "transferFrom" or metaData["sstore"][0] == "transfer"):
                 if metaData["sstore"][0] == "transferFrom":
@@ -269,11 +269,11 @@ def inferMoneyFlows(executionTable, originalContract, transferToken):
                 else:
                     if lastBlockBalance[0] != 0:
                         # we are about to replace lastBlockBalance
-                        temp = crawlQuickNode.TokenBalanceOf(transferToken, originalContract, lastBlockBalance[0] + 1)
+                        temp = crawlRPC.TokenBalanceOf(transferToken, originalContract, lastBlockBalance[0] + 1)
                         if temp != lastBlockBalance[1]:
                             print("dataFlowInfer: error: temp={} != lastBlockBalance[1]={}".format(temp, lastBlockBalance[1]))
                             sys.exit(0)
-                    transferTokenBalance = crawlQuickNode.TokenBalanceOf(transferToken, originalContract, block - 1)
+                    transferTokenBalance = crawlRPC.TokenBalanceOf(transferToken, originalContract, block - 1)
                     lastBlockBalance = [block - 1, transferTokenBalance]
                     # print("lastBlockBalance = {}".format(lastBlockBalance))
             

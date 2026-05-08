@@ -113,7 +113,7 @@ jobs:
         # A minimal stub is injected to allow imports without real credentials.
         run: |
           docker run --rm ${{ env.IMAGE_NAME }}:ci bash -c "
-          cat > /OpenTracer-Trace2Inv/settings.toml << 'TOML'
+          cat > /OpenTracer-Trace2Inv/settings.toml <<TOML_EOF << 'TOML'
           [version]
           current = \"v0.0.0-alpha\"
           [settings]

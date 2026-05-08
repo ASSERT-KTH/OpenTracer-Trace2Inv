@@ -3,7 +3,7 @@ import os
 from parserPackage.locator import *
 from trackerPackage.dataSource import *
 from fetchPackage.fetchTrace import fetcher 
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from crawlPackage.crawlEtherscan import CrawlEtherscan
 from utilsPackage.compressor import *
 from staticAnalyzer.analyzer import Analyzer
@@ -20,7 +20,7 @@ settings = toml.load("settings.toml")
 
 def inferTimeLocks(accesslistTable, enterFuncs, exitFuncs):
     
-    crawlQuickNode = CrawlQuickNode()
+    crawlRPC = CrawlRPC()
     crawlEtherscan = CrawlEtherscan()
 
 
@@ -70,8 +70,8 @@ def inferTimeLocks(accesslistTable, enterFuncs, exitFuncs):
         for tx, funcCallList in accessList:
             counter += 1
 
-            origin = crawlQuickNode.Tx2Details(tx)["from"].lower()
-            block = crawlQuickNode.Tx2Block(tx)
+            origin = crawlRPC.Tx2Details(tx)["from"].lower()
+            block = crawlRPC.Tx2Block(tx)
 
             if len(funcCallList) != 1:
                 print(funcCallList)

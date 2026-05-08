@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 import time
 import json
 from crawlPackage.crawlEtherscan import CrawlEtherscan
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from staticAnalyzer.analyzer import Analyzer
 from web3 import Web3
 import copy

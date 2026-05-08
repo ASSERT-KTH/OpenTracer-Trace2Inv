@@ -5,7 +5,7 @@ import os
 import time
 import json
 from crawlPackage.crawlEtherscan import CrawlEtherscan
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from staticAnalyzer.analyzer import Analyzer
 from parserPackage.decoder import decoder
 from parserPackage.functions import *
@@ -68,7 +68,7 @@ def unifySelectors(accesList):
 class VmtraceParser:
     def __init__(self):
         self.analyzer = Analyzer()
-        self.crawlQuickNode = CrawlQuickNode()
+        self.crawlRPC = CrawlRPC()
         self.indent = 0
         self.logging = 0
         ##### They four should be one struct
@@ -144,7 +144,7 @@ class VmtraceParser:
 
     def setupGlobalState(self, txHash: str):
 
-        details = self.crawlQuickNode.Tx2Details(txHash)
+        details = self.crawlRPC.Tx2Details(txHash)
         fromAddress = details["from"].lower()
         status = details["status"]
 

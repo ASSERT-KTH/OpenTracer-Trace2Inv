@@ -90,7 +90,7 @@ def _parseValue(val):
 
 
 
-class CrawlQuickNode:
+class CrawlRPC:
     def __init__(self):
         self.urls = settings["settings"]["ethArchives"]
         self.w3s = [Web3(HTTPProvider(url)) for url in self.urls]
@@ -397,7 +397,7 @@ class CrawlQuickNode:
                 balance = self.ERC20TokenBalanceOf(address, contract, block)
             
             if balance is None: 
-                sys.exit("crawlQuickNode: balance is None")
+                sys.exit("crawlRPC: balance is None")
             
             if block2balanceMap is None:
                 block2balanceMap = {block: balance}
@@ -503,7 +503,7 @@ class CrawlQuickNode:
 
 def main():
 
-    cq = CrawlQuickNode()
+    cq = CrawlRPC()
     # EminenceHackTx = "0x3503253131644dd9f52802d071de74e456570374d586ddd640159cf6fb9b8ad8"
     SimpleDAItransferTx = "0xeeb70054c1a08dd366570184d2da9457b08a620e2ffbbf5954bed5d8ec630943"
     # SimpleDAItransferTx2 = "0x164839b9cbf25f6050df6abc61b823baae736eef9af03fac60a9a0c87c642b63"

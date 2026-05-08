@@ -5,7 +5,7 @@ from parserPackage.parser import proxyMap
 import copy
 from trackerPackage.dataSource import *
 from fetchPackage.fetchTrace import fetcher 
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from crawlPackage.crawlEtherscan import CrawlEtherscan
 from utilsPackage.compressor import *
 from parserPackage.decoder import *
@@ -611,7 +611,7 @@ def readValuePCTypeFromSource(source, metaData, ABI):
 # 2. ranges for data flow
 
 def inferDataFlows(executionTable, enterFuncs, exitFuncs):
-    crawlQuickNode = CrawlQuickNode()
+    crawlRPC = CrawlRPC()
     crawlEtherscan = CrawlEtherscan()
 
     for  contract, executionList in executionTable:

@@ -5,7 +5,7 @@ import os
 import time
 import json
 from crawlPackage.crawlEtherscan import CrawlEtherscan
-from crawlPackage.crawlQuicknode import CrawlQuickNode
+from crawlPackage.crawlRPC import CrawlRPC
 from staticAnalyzer.analyzer import Analyzer
 from parserPackage.decoder import decoder
 from parserPackage.functions import *
@@ -35,7 +35,7 @@ class VmtraceParserGlobal:
     def __init__(self):
         self.analyzer = Analyzer()
         self.crawlEtherscan = CrawlEtherscan()
-        self.crawlQuickNode = CrawlQuickNode()
+        self.crawlRPC = CrawlRPC()
         self.indent = 0
         self.logging = 0
         ##### They four should be one struct
