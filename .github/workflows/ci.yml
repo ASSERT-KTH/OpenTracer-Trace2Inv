@@ -109,29 +109,13 @@ jobs:
           cache-from: type=gha
 
       - name: Verify internal modules are importable
-        # settings.toml is required by several modules at import time.
-        # A minimal stub is injected to allow imports without real credentials.
         run: |
-          docker run --rm ${{ env.IMAGE_NAME }}:ci bash -c "
-          cat > /OpenTracer-Trace2Inv/settings.toml <<TOML_EOF << 'TOML'
-          [version]
-          current = \"v0.0.0-alpha\"
-          [settings]
-          EtherScanApiKeys = [\"stub\"]
-          rpcProviders = [\"http://stub\"]
-          ethArchives = [\"http://stub\"]
-          [runtime]
-          LoggingUpperBound = 6
-          [experiment]
-          trainingSetRatio = 0.7
-          TOML
-          python3.10 -c '
+          docker run --rm ${{ env.IMAGE_NAME }}:ci python3.10 -c "
           from fetchPackage.fetchTrace import fetcher
           from crawlPackage.crawlRPC import CrawlRPC
           from crawlPackage.crawlEtherscan import CrawlEtherscan
           from constraintPackage.accessControlInfer import inferAccessControl
           from constraintPackage.gasControlInfer import inferGasControl
           from staticAnalyzer.analyzer import Analyzer
-          print(\"All internal modules imported successfully.\")
-          '
+          print('All internal modules imported successfully.')
           "
