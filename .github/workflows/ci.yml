@@ -1,0 +1,137 @@
+name: OpenTracer CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+env:
+  IMAGE_NAME: opentracer
+
+jobs:
+  # ── L1: Dockerfile linting ───────────────────────────────────────────────────
+  lint-dockerfile:
+    name: L1 – Dockerfile lint (hadolint)
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Run hadolint
+        uses: hadolint/hadolint-action@54c9adbab1582c2ef04b2016b760714a4bfde3cf  # v3.1.0
+        with:
+          dockerfile: Dockerfile
+          ignore: DL3008,DL3013,SC2015
+
+  # ── L2: Docker image build ───────────────────────────────────────────────────
+  build-image:
+    name: L2 – Docker build
+    runs-on: ubuntu-22.04
+    needs: lint-dockerfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2  # v3.10.0
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1  # v6.16.0
+        with:
+          context: .
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── L3: Import smoke test ────────────────────────────────────────────────────
+  smoke-test:
+    name: L3 – Smoke test (package imports)
+    runs-on: ubuntu-22.04
+    needs: build-image
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2  # v3.10.0
+
+      - name: Build image for smoke test
+        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1  # v6.16.0
+        with:
+          context: .
+          push: false
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:ci
+          cache-from: type=gha
+
+      - name: Verify all packages are importable
+        run: |
+          docker run --rm ${{ env.IMAGE_NAME }}:ci python3.10 -c "
+          import sys, importlib.util
+          pkgs = ['eth_abi', 'hexbytes', 'numpy', 'packaging',
+                  'requests', 'slither', 'toml', 'tomlkit', 'web3']
+          missing = [p for p in pkgs if importlib.util.find_spec(p) is None]
+          [print(f'  ok  {p}') for p in pkgs if p not in missing]
+          [print(f'  MISSING  {p}', file=sys.stderr) for p in missing]
+          sys.exit(1) if missing else print('All packages importable.')
+          "
+
+  # ── L4: Offline module import test ──────────────────────────────────────────
+  # OpenTracer has no pre-cached data files (unlike Trace2Inv).
+  # L4 verifies that all internal OpenTracer modules import correctly,
+  # confirming the package structure is intact.
+  #
+  # Known limitations — full end-to-end execution requires:
+  #   (1) settings.toml with valid API keys (secret, never committed)
+  #   (2) a paid debug_traceTransaction archive node endpoint
+  #   (3) TrueBlocks (chifra) installed and indexed against an archive node
+  # These are documented reproducibility barriers.
+  module-import-test:
+    name: L4 – Module import test
+    runs-on: ubuntu-22.04
+    needs: smoke-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2  # v3.10.0
+
+      - name: Build image for module test
+        uses: docker/build-push-action@14487ce63c7a62a4a324b0bfb37086795e31c6c1  # v6.16.0
+        with:
+          context: .
+          push: false
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:ci
+          cache-from: type=gha
+
+      - name: Verify internal modules are importable
+        # settings.toml is required by several modules at import time.
+        # A minimal stub is injected to allow imports without real credentials.
+        run: |
+          docker run --rm ${{ env.IMAGE_NAME }}:ci bash -c "
+          cat > /OpenTracer-Trace2Inv/settings.toml << 'TOML'
+          [version]
+          current = \"v0.0.0-alpha\"
+          [settings]
+          EtherScanApiKeys = [\"stub\"]
+          rpcProviders = [\"http://stub\"]
+          ethArchives = [\"http://stub\"]
+          [runtime]
+          LoggingUpperBound = 6
+          [experiment]
+          trainingSetRatio = 0.7
+          TOML
+          python3.10 -c '
+          from fetchPackage.fetchTrace import fetcher
+          from crawlPackage.crawlRPC import CrawlRPC
+          from crawlPackage.crawlEtherscan import CrawlEtherscan
+          from constraintPackage.accessControlInfer import inferAccessControl
+          from constraintPackage.gasControlInfer import inferGasControl
+          from staticAnalyzer.analyzer import Analyzer
+          print(\"All internal modules imported successfully.\")
+          '
+          "
